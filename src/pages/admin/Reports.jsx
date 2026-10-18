@@ -130,7 +130,9 @@ const Reports = () => {
                         <td>{formatReportParameters(row.parameters)}</td>
                         <td>{row.format?.toUpperCase() || "PDF"}</td>
                         <td>
-                          {row.status === "success" ? (
+                          {row.status === "pending" ? (
+                            <span className="badge badge-pending">⏳ Pending</span>
+                          ) : row.status === "success" ? (
                             <span className="badge badge-normal">✓ Success</span>
                           ) : (
                             <span className="badge badge-failed">× Failed</span>

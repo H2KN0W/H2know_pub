@@ -51,6 +51,7 @@ const ManagerReports = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
+  const [downloadingId, setDownloadingId] = useState(null);
   const [reportModal, setReportModal] = useState(null);
   const [form, setForm] = useState({ name: "", parameterIds: [ALL_VALUE], startDate: "", endDate: "", format: "pdf" });
 
@@ -152,23 +153,24 @@ const ManagerReports = () => {
     if (form.startDate > form.endDate) { setError("Start date must be before end date."); return; }
 
     setSaving(true);
-    setReportModal({ status: "loading", name: form.name, format: form.format });
     const isAllSelected = form.parameterIds.includes(ALL_VALUE) ||
       (parameters.length > 0 && form.parameterIds.length === parameters.length);
     const parameterNames = isAllSelected
       ? parameters.map((item) => item.name)
       : parameters.filter((item) => form.parameterIds.includes(item.id)).map((item) => item.name);
 
-    const { data: inserted, error: insertError } = await supabase
+    // Create report with explicit status = 'pending' and file_url = null (Paper Item 18)
+    const { error: insertError } = await supabase
       .from("reports")
       .insert({
         generated_by: currentUser.id,
-        report_name: form.name,
+        report_name: form.name.trim(),
         parameters: parameterNames,
         format: form.format,
         date_range_start: form.startDate,
         date_range_end: form.endDate,
-        file_url: null
+        file_url: null,
+        status: "pending"
       })
       .select()
       .single();
@@ -179,53 +181,84 @@ const ManagerReports = () => {
       return;
     }
 
-    let generationSucceeded = false;
     try {
-      const { url: fileUrl, blob } = await generateReportFile({
-        form,
-        parameters,
-        reportId: inserted.id,
-        authorName: currentUser.full_name || "Manager",
-        aiInsights,
-        weatherSummary,
+      await logActivity({
+        activity: `Requested ${form.format.toUpperCase()} report: ${form.name.trim()}`,
+        status: "Success"
       });
-      const { error: updateError } = await supabase
-        .from("reports")
-        .update({ file_url: fileUrl, status: "success" })
-        .eq("id", inserted.id);
-      if (updateError) throw updateError;
-
-      downloadReport(blob, form.name, form.format);
-      setReportModal({ status: "success", name: form.name, format: form.format });
-      generationSucceeded = true;
-    } catch (genError) {
-      console.error("Report generation failed:", genError);
-      await supabase
-        .from("reports")
-        .update({ status: "failed" })
-        .eq("id", inserted.id);
-      setReportModal({
-        status: "failed",
-        name: form.name,
-        message: "Report generation failed: " + genError.message
-      });
+    } catch (activityError) {
+      console.warn("Failed to log report activity:", activityError);
     }
 
-    if (generationSucceeded) {
-      try {
-        await logActivity({
-          activity: `Requested ${form.format.toUpperCase()} report: ${form.name}`,
-          status: "Success"
-        });
-      } catch (activityError) {
-        console.error("Failed to log report activity:", activityError);
-      }
-    }
+    setReportModal({
+      status: "pending",
+      name: form.name.trim(),
+      format: form.format,
+      message: `"${form.name.trim()}" has been created with Pending status. Click "Download" in your Report History below to generate and save the file.`
+    });
 
-    setForm({ name: "", parameterIds: [], startDate: "", endDate: "", format: "pdf" });
+    setForm({ name: "", parameterIds: [ALL_VALUE], startDate: "", endDate: "", format: "pdf" });
     setPage(1);
     await fetchReports(currentUser.id);
     setSaving(false);
+  };
+
+  const handleDownload = async (report) => {
+    setDownloadingId(report.id);
+    try {
+      const reportParamNames = Array.isArray(report.parameters) ? report.parameters : [];
+      const isAll =
+        reportParamNames.length === 0 ||
+        reportParamNames.includes("All Parameters") ||
+        (parameters.length > 0 && reportParamNames.length >= parameters.length);
+
+      const selectedParamIds = isAll
+        ? ["all"]
+        : parameters.filter((p) => reportParamNames.includes(p.name)).map((p) => p.id);
+
+      const downloadForm = {
+        name: report.report_name || "Water Quality Report",
+        parameterIds: selectedParamIds.length > 0 ? selectedParamIds : ["all"],
+        startDate: report.date_range_start,
+        endDate: report.date_range_end,
+        format: report.format || "pdf",
+      };
+
+      const { url: fileUrl, blob } = await generateReportFile({
+        form: downloadForm,
+        parameters,
+        reportId: report.id,
+        authorName: report.profiles?.full_name || currentUser?.full_name || "Manager",
+        aiInsights,
+        weatherSummary,
+      });
+
+      // Transition from 'pending' to 'success' upon manual download (Paper Item 18)
+      if (report.status === "pending") {
+        await supabase
+          .from("reports")
+          .update({ status: "success", file_url: fileUrl })
+          .eq("id", report.id);
+      }
+
+      downloadReport(blob, report.report_name || "water-quality-report", report.format || "pdf");
+
+      if (currentUser?.id) {
+        await fetchReports(currentUser.id);
+      }
+    } catch (genError) {
+      console.error("Report download failed:", genError);
+      await supabase
+        .from("reports")
+        .update({ status: "failed" })
+        .eq("id", report.id);
+      if (currentUser?.id) {
+        await fetchReports(currentUser.id);
+      }
+      alert("Failed to generate report: " + genError.message);
+    } finally {
+      setDownloadingId(null);
+    }
   };
 
   const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
@@ -419,12 +452,12 @@ const ManagerReports = () => {
                 <table className="manager-reports-table">
                   <thead>
                     <tr>
-                      <th>Name</th><th>Date generated</th><th>Range covered</th><th>Parameters</th><th>Format</th><th>Status</th>
+                      <th>Name</th><th>Date generated</th><th>Range covered</th><th>Parameters</th><th>Format</th><th>Status</th><th>Action</th>
                     </tr>
                   </thead>
                   <tbody>
                     {reports.length === 0 ? (
-                      <tr><td colSpan={6}>No reports generated yet.</td></tr>
+                      <tr><td colSpan={7}>No reports generated yet.</td></tr>
                     ) : reports.map((report) => (
                       <tr key={report.id}>
                         <td data-label="Name">{report.report_name || "Untitled report"}</td>
@@ -433,9 +466,43 @@ const ManagerReports = () => {
                         <td data-label="Parameters">{formatReportParameters(report.parameters)}</td>
                         <td data-label="Format">{report.format?.toUpperCase() || "PDF"}</td>
                         <td data-label="Status">
-                          {report.status === "success"
-                            ? <span className="badge badge-ready">✓ Success</span>
-                            : <span className="badge badge-failed">× Failed</span>}
+                          {report.status === "pending" ? (
+                            <span className="badge badge-pending">⏳ Pending</span>
+                          ) : report.status === "success" ? (
+                            <span className="badge badge-ready">✓ Success</span>
+                          ) : (
+                            <span className="badge badge-failed">× Failed</span>
+                          )}
+                        </td>
+                        <td data-label="Action">
+                          {report.status === "pending" ? (
+                            <button
+                              type="button"
+                              className="mr-download-btn"
+                              disabled={downloadingId === report.id}
+                              onClick={() => handleDownload(report)}
+                            >
+                              {downloadingId === report.id ? "Generating…" : "Download"}
+                            </button>
+                          ) : report.status === "success" ? (
+                            <button
+                              type="button"
+                              className="mr-download-btn mr-download-btn-secondary"
+                              disabled={downloadingId === report.id}
+                              onClick={() => handleDownload(report)}
+                            >
+                              {downloadingId === report.id ? "Generating…" : "Re-download"}
+                            </button>
+                          ) : (
+                            <button
+                              type="button"
+                              className="mr-download-btn mr-download-btn-retry"
+                              disabled={downloadingId === report.id}
+                              onClick={() => handleDownload(report)}
+                            >
+                              {downloadingId === report.id ? "Retrying…" : "Retry"}
+                            </button>
+                          )}
                         </td>
                       </tr>
                     ))}
@@ -465,11 +532,13 @@ const ManagerReports = () => {
             aria-busy={reportModal.status === "loading"}
           >
             <span className={`manager-report-modal-icon manager-report-modal-icon-${reportModal.status}`} aria-hidden="true">
-              {reportModal.status === "loading" ? "" : reportModal.status === "success" ? "✓" : "×"}
+              {reportModal.status === "loading" ? "" : reportModal.status === "pending" ? "⏳" : reportModal.status === "success" ? "✓" : "×"}
             </span>
             <h2 id="report-modal-title">
               {reportModal.status === "loading"
                 ? "Generating report"
+                : reportModal.status === "pending"
+                ? "Report request submitted (Pending)"
                 : reportModal.status === "success"
                 ? "Report generated successfully"
                 : "Report generation failed"}
@@ -477,6 +546,8 @@ const ManagerReports = () => {
             <p>
               {reportModal.status === "loading"
                 ? `Creating ${reportModal.format.toUpperCase()} report "${reportModal.name}"…`
+                : reportModal.status === "pending"
+                ? reportModal.message
                 : reportModal.status === "success"
                 ? `"${reportModal.name}" was generated successfully as a ${reportModal.format.toUpperCase()} report.`
                 : reportModal.message}

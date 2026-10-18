@@ -479,6 +479,50 @@
 
 .badge-pending { background: #fff2d9; color: #b3760a; border: none; }
 
+.mr-download-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 6px 14px;
+  background: var(--color-primary, #0C4C7C);
+  color: #fff;
+  border: none;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.1s ease;
+}
+
+.mr-download-btn:hover:not(:disabled) {
+  background: #09395d;
+  transform: translateY(-1px);
+}
+
+.mr-download-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.mr-download-btn-secondary {
+  background: rgba(0, 180, 216, 0.12);
+  color: #0369a1;
+}
+
+.mr-download-btn-secondary:hover:not(:disabled) {
+  background: rgba(0, 180, 216, 0.22);
+}
+
+.mr-download-btn-retry {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.mr-download-btn-retry:hover:not(:disabled) {
+  background: #fecaca;
+}
+
 /* ── Reports table ──────────────────────────────────────── */
 .table-wrap { overflow-x: auto; }
 

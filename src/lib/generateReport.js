@@ -1006,16 +1006,24 @@ export const generateReportFile = async ({
     extension = "csv";
   }
 
-  const filePath = `reports/${reportId}.${extension}`;
-  const { error: uploadError } = await supabase.storage
-    .from("reports")
-    .upload(filePath, fileBlob, {
-      upsert: true,
-      contentType: form.format === "pdf" ? "application/pdf" : "text/csv",
-    });
+  let fileUrl = null;
+  try {
+    const filePath = `reports/${reportId}.${extension}`;
+    const { error: uploadError } = await supabase.storage
+      .from("reports")
+      .upload(filePath, fileBlob, {
+        upsert: true,
+        contentType: form.format === "pdf" ? "application/pdf" : "text/csv",
+      });
 
-  if (uploadError) throw uploadError;
+    if (!uploadError) {
+      const { data: publicUrlData } = supabase.storage.from("reports").getPublicUrl(filePath);
+      fileUrl = publicUrlData?.publicUrl || null;
+    }
+  } catch (storageErr) {
+    // Storage bucket is optional; generation succeeds with fileBlob for client download
+    console.warn("Report storage upload skipped (non-blocking):", storageErr?.message);
+  }
 
-  const { data: publicUrlData } = supabase.storage.from("reports").getPublicUrl(filePath);
-  return { url: publicUrlData.publicUrl, blob: fileBlob };
+  return { url: fileUrl, blob: fileBlob };
 };

@@ -51,7 +51,8 @@ const Sidebar = () => {
           onClick={() => setMobileOpen(true)}
           aria-label="Open navigation"
         >
-          <Menu size={19} />
+          <Menu size={24} />
+          <span className="sidebar-hamburger-text">Menu</span>
         </button>
         <div className="sidebar-topbar-brand">
           <img src={H2knowLogo} alt="H2KNOW logo" />
@@ -88,15 +89,13 @@ const Sidebar = () => {
                 <NavLink
                   key={path}
                   to={path}
-                  title={label}
-                  data-tooltip={label}
                   className={({ isActive }) =>
                     isActive ? "sidebar-link active" : "sidebar-link"
                   }
                   onClick={() => setMobileOpen(false)}
                 >
-                  <Icon size={17} strokeWidth={2} className="sidebar-link-icon" />
-                  <span>{label}</span>
+                  <Icon size={24} strokeWidth={2} className="sidebar-link-icon" />
+                  <span className="sidebar-label">{label}</span>
                 </NavLink>
               ))}
             </div>

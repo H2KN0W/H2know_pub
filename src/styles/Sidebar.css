@@ -1,10 +1,8 @@
-/* ═══════════════════════════════════════════════════════════════
-   Sidebar.css — Bento SaaS Restyle
-   Slim dark icon rail on desktop, off-canvas on mobile.
-   All class names preserved.
-═══════════════════════════════════════════════════════════════ */
+/* Senior-friendly full-label sidebar.
+   Admin + Manager share these classes. Desktop always shows
+   icon + chat-bubble label. No icon-only rail, no hover tooltips.
+   Layout, theme colors and fonts unchanged. */
 
-/* ── Mobile top bar (hidden on desktop) ──────────────────────── */
 .sidebar-topbar {
   display: none;
   align-items: center;
@@ -38,26 +36,35 @@
 
 .sidebar-hamburger {
   order: 2;
-  width: 36px;
-  height: 36px;
-  display: flex;
+  min-width: 48px;
+  min-height: 48px;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
+  gap: 8px;
+  padding: 10px 16px;
   border: 1px solid var(--border);
-  border-radius: 10px;
+  border-radius: 12px;
   background: var(--color-white);
   color: var(--color-text);
   cursor: pointer;
-  transition: background var(--transition-fast, 150ms ease);
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1;
 }
 
 .sidebar-hamburger:hover { background: var(--color-bg); }
 
+.sidebar-hamburger-text {
+  display: inline;
+  font-size: 16px;
+  font-weight: 500;
+}
+
 .sidebar-scrim { display: none; }
 
-/* ── Sidebar shell ─────────────────────────────────────────────── */
 .admin-sidebar {
-  width: 72px;                /* slim icon rail */
+  width: 280px;
   flex-shrink: 0;
   height: 100vh;
   position: sticky;
@@ -66,28 +73,28 @@
   color: var(--sidebar-ink-strong, #fff);
   display: flex;
   flex-direction: column;
-  align-items: center;
-  padding: 18px 10px 16px;
-  overflow: visible;
+  align-items: stretch;
+  padding: 20px 16px 18px;
+  overflow-y: auto;
+  overflow-x: hidden;
   z-index: 50;
   gap: 0;
 }
 
-/* ── Brand logo area ───────────────────────────────────────────── */
 .sidebar-brand {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
-  gap: 0;
-  padding: 0 0 18px;
-  margin-bottom: 8px;
+  gap: 10px;
+  padding: 0 4px 18px;
+  margin-bottom: 10px;
   border-bottom: 1px solid rgba(255,255,255,0.10);
   width: 100%;
 }
 
 .sidebar-logo {
-  width: 38px;
-  height: 38px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   object-fit: cover;
   border: 2px solid rgba(255,255,255,0.30);
@@ -95,184 +102,232 @@
   box-shadow: 0 2px 8px rgba(0,0,0,0.25);
 }
 
-/* Hide text labels on the slim rail (visible on mobile open panel) */
-.sidebar-title,
-.sidebar-subtitle,
+.sidebar-title {
+  display: block;
+  font-family: var(--font-display,"Poppins","Inter",sans-serif);
+  font-size: 1rem;
+  font-weight: 700;
+  margin: 0;
+  color: #fff;
+  line-height: 1.2;
+}
+
+.sidebar-subtitle {
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: rgba(255,255,255,0.72);
+  margin: 2px 0 0;
+  line-height: 1.2;
+}
+
 .sidebar-close {
   display: none;
 }
 
-/* ── Decorative 3D water-drop accent ──────────────────────────── */
-.sidebar-brand::after {
-  content: "◈";
-  display: block;
-  font-size: 1.1rem;
-  color: rgba(255,255,255,0.18);
-  margin-top: 10px;
-  letter-spacing: 0;
-  animation: ds-accent-float 4s ease-in-out infinite;
-}
 
-@keyframes ds-accent-float {
-  0%, 100% { transform: translateY(0);  opacity: 0.18; }
-  50%       { transform: translateY(-4px); opacity: 0.30; }
-}
-
-/* ── Nav ────────────────────────────────────────────────────────── */
 .sidebar-nav {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 12px;
   width: 100%;
-  align-items: center;
+  align-items: stretch;
 }
 
 .sidebar-section {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 4px;
+  align-items: stretch;
+  gap: 8px;
   width: 100%;
 }
 
-/* Hide section labels on icon rail */
-.sidebar-nav-label { display: none; }
+.sidebar-nav-label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: rgba(255,255,255,0.62);
+  margin: 4px 0 4px 10px;
+}
 
 .sidebar-link {
   position: relative;
   display: flex;
   align-items: center;
-  justify-content: center;
-  width: 46px;
-  height: 46px;
-  border-radius: 999px;
-  color: var(--sidebar-ink, rgba(255,255,255,0.65));
+  justify-content: flex-start;
+  gap: 12px;
+  width: 100%;
+  min-height: 48px;
+  padding: 6px 8px 6px 10px;
+  border-radius: 14px;
+  color: var(--sidebar-ink-strong, #fff);
   text-decoration: none;
-  transition: background var(--transition-fast, 150ms ease),
-              color var(--transition-fast, 150ms ease),
-              transform var(--transition-fast, 150ms ease);
 }
 
-/* Hide link text labels on icon rail */
-.sidebar-link span { display: none; }
-
-.sidebar-link-icon { opacity: 0.8; }
-
-.sidebar-link:hover {
-  background: rgba(255,255,255,0.10);
-  color: var(--sidebar-ink-strong, #fff);
-  transform: scale(1.05);
+.sidebar-link-icon {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+  opacity: 1;
 }
 
-.sidebar-link:hover .sidebar-link-icon { opacity: 1; }
-
-/* Pill active state with indicator dot */
-.sidebar-link.active {
+.sidebar-link .sidebar-label {
+  display: block;
+  position: relative;
+  flex: 1;
+  min-width: 0;
   background: rgba(255,255,255,0.16);
-  color: var(--sidebar-ink-strong, #fff);
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.35;
+  padding: 10px 14px 10px 16px;
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,0.16);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.20);
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
-.sidebar-link.active .sidebar-link-icon { opacity: 1; }
-
-.sidebar-link.active::before {
+.sidebar-link .sidebar-label::before {
   content: "";
   position: absolute;
-  left: -10px;
+  left: -7px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 0;
+  height: 0;
+  border-top: 7px solid transparent;
+  border-bottom: 7px solid transparent;
+  border-right: 8px solid rgba(255,255,255,0.16);
+}
+
+.sidebar-link:hover .sidebar-label {
+  background: rgba(255,255,255,0.26);
+  border-color: rgba(255,255,255,0.28);
+}
+
+.sidebar-link:hover .sidebar-label::before {
+  border-right-color: rgba(255,255,255,0.26);
+}
+
+.sidebar-link.active .sidebar-label {
+  background: #0077b6;
+  border-color: #0077b6;
+  color: #ffffff;
+  font-weight: 600;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.28), 0 0 0 2px rgba(255,255,255,0.35);
+}
+
+.sidebar-link.active .sidebar-label::before {
+  border-right-color: #0077b6;
+}
+
+.sidebar-link.active:hover .sidebar-label {
+  background: #0090d4;
+  border-color: #0090d4;
+}
+
+.sidebar-link.active:hover .sidebar-label::before {
+  border-right-color: #0090d4;
+}
+
+.sidebar-link.active::after {
+  content: "";
+  position: absolute;
+  left: -8px;
   top: 50%;
   transform: translateY(-50%);
   width: 4px;
-  height: 22px;
+  height: 28px;
   border-radius: 999px;
   background: #00b4d8;
   box-shadow: 0 0 8px rgba(0,180,216,0.6);
 }
 
-/* ── Footer ─────────────────────────────────────────────────────── */
 .sidebar-footer {
   padding-top: 14px;
-  margin-top: 8px;
+  margin-top: 12px;
   border-top: 1px solid rgba(255,255,255,0.10);
   width: 100%;
   display: flex;
-  justify-content: center;
+  justify-content: stretch;
 }
 
 .sidebar-logout {
-  width: 46px;
-  height: 46px;
+  width: 100%;
+  min-height: 48px;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
+  gap: 12px;
+  padding: 6px 8px 6px 10px;
   border: 1px solid rgba(255,255,255,0.20);
-  border-radius: 999px;
+  border-radius: 14px;
   background: transparent;
-  color: var(--sidebar-ink, rgba(255,255,255,0.65));
-  font-size: 0.75rem;
-  font-weight: 600;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 500;
   cursor: pointer;
-  transition: background var(--transition-fast, 150ms ease),
-              border-color var(--transition-fast, 150ms ease),
-              color var(--transition-fast, 150ms ease);
 }
 
 .sidebar-logout-text {
-  display: none;
+  display: block;
+  flex: 1;
+  min-width: 0;
+  position: relative;
+  background: rgba(255,255,255,0.14);
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.35;
+  padding: 10px 14px 10px 16px;
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,0.14);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.sidebar-logout-text::before {
+  content: "";
+  position: absolute;
+  left: -7px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 0;
+  height: 0;
+  border-top: 7px solid transparent;
+  border-bottom: 7px solid transparent;
+  border-right: 8px solid rgba(255,255,255,0.14);
 }
 
 .sidebar-logout-icon {
-  opacity: 0.8;
+  width: 24px;
+  height: 24px;
   flex-shrink: 0;
-  transition: opacity var(--transition-fast, 150ms ease);
-}
-
-.sidebar-logout:hover {
-  background: rgba(255,255,255,0.12);
-  border-color: rgba(255,255,255,0.40);
-  color: var(--sidebar-ink-strong, #fff);
-}
-
-.sidebar-logout:hover .sidebar-logout-icon {
   opacity: 1;
 }
 
-/* ── Hover Tooltips for Desktop Rail ────────────────────────────── */
-@media (min-width: 1025px) {
-  .sidebar-link[data-tooltip],
-  .sidebar-logout[data-tooltip] {
-    position: relative;
-  }
-
-  .sidebar-link[data-tooltip]::after,
-  .sidebar-logout[data-tooltip]::after {
-    content: attr(data-tooltip);
-    position: absolute;
-    left: calc(100% + 14px);
-    top: 50%;
-    transform: translateY(-50%) translateX(-4px);
-    background: #062840;
-    color: #ffffff;
-    font-size: 0.76rem;
-    font-weight: 600;
-    padding: 6px 12px;
-    border-radius: 8px;
-    white-space: nowrap;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 160ms cubic-bezier(0.4, 0, 0.2, 1), transform 160ms cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 4px 16px rgba(0, 20, 35, 0.35);
-    z-index: 100;
-    border: 1px solid rgba(255,255,255,0.12);
-  }
-
-  .sidebar-link[data-tooltip]:hover::after,
-  .sidebar-logout[data-tooltip]:hover::after {
-    opacity: 1;
-    transform: translateY(-50%) translateX(0);
-  }
+.sidebar-logout:hover {
+  background: rgba(255,255,255,0.08);
+  border-color: rgba(255,255,255,0.40);
+  color: #fff;
 }
 
-/* ── Logout overlay ─────────────────────────────────────────────── */
+.sidebar-logout:hover .sidebar-logout-text {
+  background: rgba(255,255,255,0.24);
+}
+
+.sidebar-logout:hover .sidebar-logout-text::before {
+  border-right-color: rgba(255,255,255,0.24);
+}
+
 .logout-overlay {
   position: fixed;
   top: 0;
@@ -281,10 +336,7 @@
   bottom: 0;
   width: 100vw;
   height: 100vh;
-  inset: 0;
   background: rgba(2,62,92,0.50);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -317,7 +369,6 @@
   font-family: var(--font-display,"Poppins","Inter",sans-serif);
 }
 
-/* ── Spinners ───────────────────────────────────────────────────── */
 .spinner {
   width: 17px;
   height: 17px;
@@ -333,27 +384,18 @@
   border-top-color: var(--color-primary, #0C4C7C);
 }
 
-@keyframes spin { to { transform: rotate(360deg); } }
-
-/* ═══════════════════════════════════════════════════════════════
-   RESPONSIVE — tablet + mobile (≤1024px)
-   Off-canvas full-width panel that reveals labels/sections.
-═══════════════════════════════════════════════════════════════ */
 @media (max-width: 1024px) {
-  .admin-shell { flex-direction: column; }
-
-  .sidebar-topbar { display: flex; }
-
-  /* Full-width off-canvas panel */
   .admin-sidebar {
     position: fixed;
     top: 0;
     left: 0;
-    width: 260px;
+    width: 300px;
+    max-width: 86vw;
     height: 100vh;
-    padding: 20px 14px 18px;
+    height: 100dvh;
+    padding: 20px 16px 18px;
     align-items: stretch;
-    transform: translateX(-100%);
+    transform: translateX(-105%);
     transition: transform 220ms cubic-bezier(0.4,0,0.2,1);
     box-shadow: none;
   }
@@ -363,41 +405,25 @@
     box-shadow: 24px 0 48px rgba(2,40,60,0.22);
   }
 
-  /* Show close button */
+  .sidebar-topbar { display: flex; }
+
   .sidebar-close {
     display: flex;
     margin-left: auto;
-    width: 30px;
-    height: 30px;
+    width: 44px;
+    height: 44px;
     align-items: center;
     justify-content: center;
     border: none;
-    background: transparent;
-    color: rgba(255,255,255,0.7);
+    background: rgba(255,255,255,0.12);
+    color: #fff;
     cursor: pointer;
-    border-radius: 8px;
+    border-radius: 12px;
     flex-shrink: 0;
   }
 
   .sidebar-close:hover {
-    background: rgba(255,255,255,0.10);
-  }
-
-  /* Show brand text */
-  .sidebar-title {
-    display: block;
-    font-family: var(--font-display,"Poppins","Inter",sans-serif);
-    font-size: 0.92rem;
-    font-weight: 700;
-    margin: 0;
-    color: #fff;
-  }
-
-  .sidebar-subtitle {
-    display: block;
-    font-size: 0.68rem;
-    color: rgba(255,255,255,0.45);
-    margin: 1px 0 0;
+    background: rgba(255,255,255,0.20);
   }
 
   .sidebar-brand {
@@ -405,52 +431,9 @@
     padding-bottom: 16px;
   }
 
-  .sidebar-brand::after { display: none; }
-
-  /* Full-width links with label text */
   .sidebar-nav,
   .sidebar-section {
     align-items: stretch;
-  }
-
-  .sidebar-nav-label {
-    display: block;
-    font-size: 0.62rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.07em;
-    color: rgba(255,255,255,0.38);
-    margin: 0 0 4px 12px;
-  }
-
-  .sidebar-link {
-    width: 100%;
-    height: auto;
-    border-radius: 10px;
-    padding: 10px 12px;
-    justify-content: flex-start;
-    gap: 10px;
-  }
-
-  .sidebar-link span { display: inline; font-size: 0.84rem; font-weight: 500; }
-
-  .sidebar-link.active::before { display: none; }
-
-  /* Logout: show full text again */
-  .sidebar-logout {
-    width: 100%;
-    height: auto;
-    padding: 10px 12px;
-    border-radius: 10px;
-    justify-content: flex-start;
-    gap: 10px;
-    font-size: 0.84rem;
-  }
-
-  .sidebar-logout-text {
-    display: inline;
-    font-size: 0.84rem;
-    font-weight: 500;
   }
 
   .sidebar-scrim {
@@ -463,5 +446,5 @@
 }
 
 @media (max-width: 480px) {
-  .admin-sidebar { width: 84vw; max-width: 280px; }
+  .admin-sidebar { width: 86vw; max-width: 320px; }
 }

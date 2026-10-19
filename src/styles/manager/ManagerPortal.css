@@ -333,8 +333,8 @@
 
 .manager-shell .sidebar-link.active,
 .admin-shell:has(.manager-main) .sidebar-link.active {
-  background: rgba(255,255,255,0.16);
-  color: #ffffff;
+  background: #e8f4fb;
+  color: var(--color-primary, #0C4C7C);
 }
 
 /* Band row (used in AnalyticsTrends) */

@@ -19,7 +19,7 @@ const ManagerSidebar = () => {
   return (
     <>
       <div className="sidebar-topbar">
-        <button type="button" className="sidebar-hamburger" onClick={() => setMobileOpen(true)} aria-label="Open navigation"><Menu size={19} /></button>
+        <button type="button" className="sidebar-hamburger" onClick={() => setMobileOpen(true)} aria-label="Open navigation"><Menu size={24} /><span className="sidebar-hamburger-text">Menu</span></button>
         <div className="sidebar-topbar-brand"><img src={H2knowLogo} alt="H2KNOW logo" /><span>H2KNOW</span></div>
       </div>
       {mobileOpen && <div className="sidebar-scrim" onClick={() => setMobileOpen(false)} />}
@@ -30,7 +30,7 @@ const ManagerSidebar = () => {
           <button type="button" className="sidebar-close" onClick={() => setMobileOpen(false)} aria-label="Close navigation"><X size={17} /></button>
         </div>
         <nav className="sidebar-nav"><div className="sidebar-section"><p className="sidebar-nav-label">Monitoring</p>
-          {items.map(({ label, path, icon: Icon }) => <NavLink key={path} to={path} title={label} data-tooltip={label} className={({ isActive }) => isActive ? "sidebar-link active" : "sidebar-link"} onClick={() => setMobileOpen(false)}><Icon size={17} strokeWidth={2} className="sidebar-link-icon" /><span>{label}</span></NavLink>)}
+          {items.map(({ label, path, icon: Icon }) => <NavLink key={path} to={path} className={({ isActive }) => isActive ? "sidebar-link active" : "sidebar-link"} onClick={() => setMobileOpen(false)}><Icon size={20} strokeWidth={2} className="sidebar-link-icon" /><span className="sidebar-label">{label}</span></NavLink>)}
         </div></nav>
         <div className="sidebar-footer"><LogoutButton /></div>
       </aside>

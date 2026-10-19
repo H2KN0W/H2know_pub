@@ -48,15 +48,19 @@
   min-height: 100vh;
   background: var(--color-bg);
   font-family: var(--font-body);
+  overflow-x: clip;
 }
 
 .admin-main {
   flex: 1;
   min-width: 0;
+  max-width: 100%;
   padding: 32px 36px 48px;
   display: flex;
   flex-direction: column;
   gap: 24px;
+  box-sizing: border-box;
+  overflow-x: clip;
   /* soft outer shadow so the canvas feels like a floating product */
 }
 
@@ -329,8 +333,10 @@
 /* ── Panel grid (tables) ───────────────────────────────────────── */
 .panel-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(400px, 100%), 1fr));
   gap: 20px;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .panel {
